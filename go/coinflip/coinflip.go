@@ -26,8 +26,29 @@ type Coin interface {
 	Flip() string
 }
 
+func WithCoin(c Coin) func(cf *Coinflip) {
+	return func(cf *Coinflip) {
+		cf.coin = c
+	}
+}
+
+type PredictableCoin struct {
+	Outcome string
+}
+
+func (c *PredictableCoin) Flip() string {
+	return c.Outcome
+}
+
+type RegularCoin struct{}
+
+func (c *RegularCoin) Flip() string {
+	return []string{"head", "tail"}[rand.Intn(2)]
+}
+
 type Coinflip struct {
 	clock     Clock
+	coin      Coin
 	isStarted bool
 	ledger    *Ledger
 	Outcome   maybe.Maybe[string]
@@ -36,6 +57,7 @@ type Coinflip struct {
 func NewCoinflip(options ...func(*Coinflip)) *Coinflip {
 	c := &Coinflip{
 		clock:     &RegularClock{},
+		coin:      &RegularCoin{},
 		isStarted: false,
 		ledger:    &Ledger{},
 	}
@@ -50,11 +72,7 @@ func (c *Coinflip) AllBets() []Bet {
 }
 
 func (c *Coinflip) Flip() {
-	if rand.Intn(2) == 0 {
-		c.Outcome = maybe.Just("head")
-	} else {
-		c.Outcome = maybe.Just("tail")
-	}
+	c.Outcome = maybe.Just(c.coin.Flip())
 }
 
 func (c *Coinflip) LostBets() []Bet {
@@ -112,10 +130,6 @@ func (c *Coinflip) Process(m *Message) error {
 	}
 }
 
-func (c *Coinflip) registerBet(b Bet) {
-	c.ledger.Register(b)
-}
-
 func (c *Coinflip) Start() {
 	c.isStarted = true
 }
@@ -133,8 +147,7 @@ type Message struct {
 	Content string
 }
 
-type RegularClock struct {
-}
+type RegularClock struct{}
 
 func (c *RegularClock) Now() time.Time {
 	return time.Now()
