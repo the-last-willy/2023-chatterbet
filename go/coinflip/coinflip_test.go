@@ -138,34 +138,3 @@ func (suite *CoinflipWithSomeBetsTestSuite) TestFlippingOnTailShouldLoseBetsOnHe
 		User:    "user#3",
 	})
 }
-
-//
-//var _ = Describe("a coinflip game with bets", func() {
-//	var coinflip *Coinflip
-//
-//	Context("that was flipped on head", func() {
-//		BeforeEach(func() {
-//			coinflip.Flip()
-//		})
-//
-//		It("should have bets on head as wins", func() {
-//			bs := coinflip.WonBets()
-//			Expect(bs).To(HaveExactElements(
-//				Bet{
-//					Outcome: "head",
-//					User:    "user#3",
-//				},
-//			))
-//		})
-//
-//		It("should have bets on tail as loses", func() {
-//			bs := coinflip.LostBets()
-//			Expect(bs).To(HaveExactElements(
-//				Bet{
-//					Outcome: "tail",
-//					User:    "user#4",
-//				},
-//			))
-//		})
-//	})
-//})
