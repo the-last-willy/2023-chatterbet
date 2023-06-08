@@ -89,7 +89,8 @@ func (suite *StartedCoinflipTestSuite) TestShouldHaveAnOutcomeAfterItsFlipped() 
 
 type CoinflipWithSomeBetsTestSuite struct {
 	suite.Suite
-	cf *Coinflip
+	cf   *Coinflip
+	coin *PredictableCoin
 }
 
 func TestCoinflipWithSomeBetsTestSuite(t *testing.T) {
@@ -97,8 +98,12 @@ func TestCoinflipWithSomeBetsTestSuite(t *testing.T) {
 }
 
 func (suite *CoinflipWithSomeBetsTestSuite) SetupTest() {
-	suite.cf = NewCoinflip()
+	suite.coin = &PredictableCoin{}
+	suite.cf = NewCoinflip(WithCoin(suite.coin))
 	suite.cf.Start()
+}
+
+func (suite *CoinflipWithSomeBetsTestSuite) TestFlippingOnHeadShouldWinBetsOnHead() {
 	suite.cf.Process(&Message{
 		User:    "user#3",
 		Content: "!bet head",
@@ -106,6 +111,31 @@ func (suite *CoinflipWithSomeBetsTestSuite) SetupTest() {
 	suite.cf.Process(&Message{
 		User:    "user#4",
 		Content: "!bet tail",
+	})
+	suite.coin.Outcome = "head"
+	suite.cf.Flip()
+	bs := suite.cf.WonBets()
+	assert.Contains(suite.T(), bs, Bet{
+		Outcome: "head",
+		User:    "user#3",
+	})
+}
+
+func (suite *CoinflipWithSomeBetsTestSuite) TestFlippingOnTailShouldLoseBetsOnHead() {
+	suite.cf.Process(&Message{
+		User:    "user#3",
+		Content: "!bet head",
+	})
+	suite.cf.Process(&Message{
+		User:    "user#4",
+		Content: "!bet tail",
+	})
+	suite.coin.Outcome = "tail"
+	suite.cf.Flip()
+	bs := suite.cf.LostBets()
+	assert.Contains(suite.T(), bs, Bet{
+		Outcome: "head",
+		User:    "user#3",
 	})
 }
 
