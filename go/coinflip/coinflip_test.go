@@ -2,6 +2,7 @@ package coinflip_test
 
 import (
 	. "chatterbet/coinflip"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -12,6 +13,8 @@ import (
 type NewCoinflipTestSuite struct {
 	suite.Suite
 	cf *Coinflip
+
+	clock *ManualClock
 }
 
 func TestNewCoinflipTestSuite(t *testing.T) {
@@ -19,7 +22,8 @@ func TestNewCoinflipTestSuite(t *testing.T) {
 }
 
 func (suite *NewCoinflipTestSuite) SetupTest() {
-	suite.cf = NewCoinflip()
+	suite.clock = &ManualClock{NowValue: time.Now()}
+	suite.cf = NewCoinflip(WithClock(suite.clock))
 }
 
 func (suite *NewCoinflipTestSuite) TestShouldNotBeStarted() {
@@ -37,6 +41,13 @@ func (suite *NewCoinflipTestSuite) TestShouldStartWhenSomeoneSendPlayMessage() {
 		Content: "!play coinflip",
 	})
 	assert.True(suite.T(), suite.cf.IsStarted())
+}
+
+func (suite *NewCoinflipTestSuite) Test_flips_some_time_after_getting_started() {
+	suite.cf.Start()
+	suite.clock.NowValue.Add(11 * time.Second)
+	suite.cf.Update()
+	assert.True(suite.T(), suite.cf.HasFlipped())
 }
 
 type StartedCoinflipTestSuite struct {
