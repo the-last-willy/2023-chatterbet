@@ -22,6 +22,20 @@ func WithClock(cl Clock) func(*Coinflip) {
 	}
 }
 
+type ManualClock struct {
+	NowValue time.Time
+}
+
+func (c *ManualClock) Now() time.Time {
+	return c.NowValue
+}
+
+type RegularClock struct{}
+
+func (c *RegularClock) Now() time.Time {
+	return time.Now()
+}
+
 type Coin interface {
 	Flip() string
 }
@@ -47,23 +61,34 @@ func (c *RegularCoin) Flip() string {
 }
 
 type Coinflip struct {
-	clock     Clock
-	coin      Coin
-	isStarted bool
-	ledger    *Ledger
-	Outcome   maybe.Maybe[string]
+	clock      Clock
+	coin       Coin
+	isStarted  bool
+	ledger     *Ledger
+	Outcome    maybe.Maybe[string]
+	hasFlipped bool
+
+	bettingDuration time.Duration
+
+	timeStarted time.Time
 }
 
 func NewCoinflip(options ...func(*Coinflip)) *Coinflip {
 	c := &Coinflip{
-		clock:     &RegularClock{},
-		coin:      &RegularCoin{},
-		isStarted: false,
-		ledger:    &Ledger{},
+		clock:           &RegularClock{},
+		coin:            &RegularCoin{},
+		isStarted:       false,
+		ledger:          &Ledger{},
+		Outcome:         maybe.Nothing[string](),
+		hasFlipped:      false,
+		bettingDuration: 10 * time.Second,
 	}
 	for _, o := range options {
 		o(c)
 	}
+
+	c.timeStarted = c.clock.Now()
+
 	return c
 }
 
@@ -73,6 +98,11 @@ func (c *Coinflip) AllBets() []Bet {
 
 func (c *Coinflip) Flip() {
 	c.Outcome = maybe.Just(c.coin.Flip())
+	c.hasFlipped = true
+}
+
+func (c *Coinflip) HasFlipped() bool {
+	return c.hasFlipped
 }
 
 func (c *Coinflip) LostBets() []Bet {
@@ -134,6 +164,12 @@ func (c *Coinflip) Start() {
 	c.isStarted = true
 }
 
+func (c *Coinflip) Update() {
+	if c.timeStarted.Add(c.bettingDuration).After(c.clock.Now()) {
+		c.Flip()
+	}
+}
+
 type Ledger struct {
 	Bets []Bet
 }
@@ -145,10 +181,4 @@ func (l *Ledger) Register(b Bet) {
 type Message struct {
 	User    string
 	Content string
-}
-
-type RegularClock struct{}
-
-func (c *RegularClock) Now() time.Time {
-	return time.Now()
 }
