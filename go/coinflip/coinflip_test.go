@@ -115,11 +115,11 @@ func (suite *CoinflipWithSomeBetsTestSuite) SetupTest() {
 }
 
 func (suite *CoinflipWithSomeBetsTestSuite) TestFlippingOnHeadShouldWinBetsOnHead() {
-	suite.cf.Process(&Message{
+	_ = suite.cf.Process(&Message{
 		User:    "user#3",
 		Content: "!bet head",
 	})
-	suite.cf.Process(&Message{
+	_ = suite.cf.Process(&Message{
 		User:    "user#4",
 		Content: "!bet tail",
 	})
@@ -133,11 +133,11 @@ func (suite *CoinflipWithSomeBetsTestSuite) TestFlippingOnHeadShouldWinBetsOnHea
 }
 
 func (suite *CoinflipWithSomeBetsTestSuite) TestFlippingOnTailShouldLoseBetsOnHead() {
-	suite.cf.Process(&Message{
+	_ = suite.cf.Process(&Message{
 		User:    "user#3",
 		Content: "!bet head",
 	})
-	suite.cf.Process(&Message{
+	_ = suite.cf.Process(&Message{
 		User:    "user#4",
 		Content: "!bet tail",
 	})
