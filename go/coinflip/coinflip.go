@@ -164,6 +164,10 @@ func (c *Coinflip) Process(m *Message) error {
 func (c *Coinflip) Start() {
 	c.isStarted = true
 	c.timeStarted = c.clock.Now()
+
+	if c.MessageChannel != nil {
+		c.MessageChannel <- "Coinflip started. Place your bets!"
+	}
 }
 
 func (c *Coinflip) Update() {
