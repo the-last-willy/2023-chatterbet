@@ -154,7 +154,8 @@ func (c *Coinflip) Start() {
 
 func (c *Coinflip) Update() {
 	now := c.clock.Now()
-	if !c.HasFlipped() && c.timeStarted.Add(c.bettingDuration).After(now) {
+	bettingOver := now.After(c.timeStarted.Add(c.bettingDuration))
+	if !c.HasFlipped() && bettingOver {
 		c.Flip()
 	}
 	c.timeLastUpdated = now
