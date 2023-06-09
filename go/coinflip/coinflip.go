@@ -70,7 +70,10 @@ type Coinflip struct {
 
 	bettingDuration time.Duration
 
-	timeStarted time.Time
+	timeLastUpdated time.Time
+	timeStarted     time.Time
+
+	MessageChannel chan<- string
 }
 
 func NewCoinflip(options ...func(*Coinflip)) *Coinflip {
@@ -164,9 +167,11 @@ func (c *Coinflip) Start() {
 }
 
 func (c *Coinflip) Update() {
-	if c.timeStarted.Add(c.bettingDuration).After(c.clock.Now()) {
+	now := c.clock.Now()
+	if !c.HasFlipped() && c.timeStarted.Add(c.bettingDuration).After(now) {
 		c.Flip()
 	}
+	c.timeLastUpdated = now
 }
 
 type Ledger struct {
