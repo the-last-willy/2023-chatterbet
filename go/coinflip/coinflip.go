@@ -12,30 +12,6 @@ type Bet struct {
 	User    string
 }
 
-type Clock interface {
-	Now() time.Time
-}
-
-func WithClock(cl Clock) func(*Coinflip) {
-	return func(cf *Coinflip) {
-		cf.clock = cl
-	}
-}
-
-type ManualClock struct {
-	NowValue time.Time
-}
-
-func (c *ManualClock) Now() time.Time {
-	return c.NowValue
-}
-
-type RegularClock struct{}
-
-func (c *RegularClock) Now() time.Time {
-	return time.Now()
-}
-
 type Coin interface {
 	Flip() string
 }
