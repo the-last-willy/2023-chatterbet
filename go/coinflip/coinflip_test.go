@@ -149,3 +149,29 @@ func (suite *CoinflipWithSomeBetsTestSuite) TestFlippingOnTailShouldLoseBetsOnHe
 		User:    "user#3",
 	})
 }
+
+func Test_coinflip_flips_a_single_time_after_betting_is_over(t *testing.T) {
+	cl := &ManualClock{}
+	co := &PredictableCoin{Outcome: "head"}
+	cf := NewCoinflip(WithClock(cl), WithCoin(co))
+
+	cf.Start()
+	cl.NowValue.Add(11 * time.Second)
+	cf.Update()
+	co.Outcome = "tail"
+	cf.Update()
+
+	o, _ := cf.Outcome.Value()
+	assert.Equal(t, "head", o)
+}
+
+//func Test_coinflip_tells_a_message_when_it_is_started(t *testing.T) {
+//	messages := make(chan string, 5)
+//	cf := NewCoinflip()
+//	cf.MessageChannel = messages
+//
+//	cf.Start()
+//	cf.Update()
+//
+//	assert.True(t, len(messages) == 1)
+//}
