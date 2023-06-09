@@ -175,3 +175,17 @@ func Test_coinflip_sends_a_message_when_it_is_started(t *testing.T) {
 
 	assert.Equal(t, 1, len(messages))
 }
+
+func Test_coinflip_sends_a_message_when_it_is_flipped(t *testing.T) {
+	messages := make(chan string, 5)
+	cf := NewCoinflip()
+	cf.MessageChannel = messages
+
+	cf.Start()
+	cf.Update()
+	ClearChannel(messages)
+	cf.Flip()
+	cf.Update()
+
+	assert.Equal(t, 1, len(messages))
+}
