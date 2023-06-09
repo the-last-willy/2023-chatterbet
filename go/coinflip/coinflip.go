@@ -3,6 +3,7 @@ package coinflip
 import (
 	"chatterbet/maybe"
 	"errors"
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -76,6 +77,11 @@ func (c *Coinflip) AllBets() []Bet {
 func (c *Coinflip) Flip() {
 	c.Outcome = maybe.Just(c.coin.Flip())
 	c.hasFlipped = true
+
+	if c.MessageChannel != nil {
+		o, _ := c.Outcome.Value()
+		c.MessageChannel <- fmt.Sprintf("The coin is flipping... On %s!", o)
+	}
 }
 
 func (c *Coinflip) HasFlipped() bool {
