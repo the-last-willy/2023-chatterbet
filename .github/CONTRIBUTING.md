@@ -10,18 +10,15 @@
 
 | Tag      | Description |
 |----------|-------------|
-| (clean)  |             |
-| (doc)    |             |
 | (refact) |             |
+| (test)   |             |
 
 **Functional axis:**
 
 | Tag    | Description |
 |--------|-------------|
-| (doc)  |             |
 | (feat) |             |
 | (fix)  |             |
-| (test) |             |
 
 **Operational axis:**
 
@@ -30,3 +27,11 @@
 | (build) |             |
 | (cicd)  |             |
 | (perf)  |             |
+
+**Other:**
+
+| Tag     | Description |
+|---------|-------------|
+| (clean) |             |
+| (doc)   |             |
+| (tool)  |             |
