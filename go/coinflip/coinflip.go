@@ -87,8 +87,6 @@ func NewCoinflip(options ...func(*Coinflip)) *Coinflip {
 		o(c)
 	}
 
-	c.timeStarted = c.clock.Now()
-
 	return c
 }
 
@@ -162,6 +160,7 @@ func (c *Coinflip) Process(m *Message) error {
 
 func (c *Coinflip) Start() {
 	c.isStarted = true
+	c.timeStarted = c.clock.Now()
 }
 
 func (c *Coinflip) Update() {
