@@ -22,7 +22,7 @@ func TestNewCoinflipTestSuite(t *testing.T) {
 }
 
 func (suite *NewCoinflipTestSuite) SetupTest() {
-	suite.clock = &ManualClock{NowValue: time.Now()}
+	suite.clock = NewManualClock()
 	suite.cf = NewCoinflip(WithClock(suite.clock))
 }
 
@@ -45,7 +45,7 @@ func (suite *NewCoinflipTestSuite) TestShouldStartWhenSomeoneSendPlayMessage() {
 
 func (suite *NewCoinflipTestSuite) Test_flips_some_time_after_getting_started() {
 	suite.cf.Start()
-	suite.clock.NowValue.Add(11 * time.Second)
+	suite.clock.Advance(11 * time.Second)
 	suite.cf.Update()
 	assert.True(suite.T(), suite.cf.HasFlipped())
 }
@@ -156,7 +156,7 @@ func Test_coinflip_flips_a_single_time_after_betting_is_over(t *testing.T) {
 	cf := NewCoinflip(WithClock(cl), WithCoin(co))
 
 	cf.Start()
-	cl.NowValue.Add(11 * time.Second)
+	cl.Advance(11 * time.Second)
 	cf.Update()
 	co.Outcome = "tail"
 	cf.Update()
