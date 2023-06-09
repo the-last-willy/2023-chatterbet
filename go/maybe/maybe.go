@@ -1,23 +1,27 @@
 package maybe
 
-type Maybe[V any] struct {
+// Maybe instances might or might not contain a value of a given type.
+type Maybe[T any] struct {
 	has   bool
-	value V
+	value T
 }
 
-func Just[V any](value V) Maybe[V] {
-	return Maybe[V]{
+// Just returns a `Maybe` containing `value`
+func Just[T any](value T) Maybe[T] {
+	return Maybe[T]{
 		has:   true,
 		value: value,
 	}
 }
 
-func Nothing[V any]() Maybe[V] {
-	return Maybe[V]{
+// Nothing returns a `Maybe` containing no value.
+func Nothing[T any]() Maybe[T] {
+	return Maybe[T]{
 		has: false,
 	}
 }
 
-func (o *Maybe[V]) Value() (value V, has bool) {
+// Value returns the value of maybe and whether that value is valid.
+func (o *Maybe[T]) Value() (value T, has bool) {
 	return o.value, o.has
 }
